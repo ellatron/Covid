@@ -1,0 +1,17 @@
+---
+title: "CovidAnalysisFinal"
+author: "Ellen Coy"
+date: "6/18/2021"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(scales)
+```
+
