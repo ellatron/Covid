@@ -1,5 +1,5 @@
 ---
-title: "CovidAnalysisFinal"
+title: "Covid Analysis Final"
 author: "Ellen Coy"
 date: "6/18/2021"
 output: github_document
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Statement of Interest
 
-This report is to analyze covid 19 cases and deaths within the United States. 
+This report is to analyze covid 19 cases and deaths within the United States. Looking at the number of new cases and new reported deaths and comparing the death rates as the pandemic continued.  
 
 ```{r}
 library(tidyverse)
@@ -116,13 +116,16 @@ us_all <- us_state %>%
 
 ```
 
-# Analysis
+# Analysis and Visualizations
 
 ## New Cases by Date
+
+This visualization shows the US peaked on new cases daily in the last quarter of 2020 and first quarter of 2021.
 
 ```{r US new cases line}
 ggplot(data = us_all) +
   geom_line(mapping = aes(x = Date, y = New_Cases)) +
+  geom_smooth(mapping = aes(x = Date, y = New_Cases))+
   scale_y_continuous(labels = comma) + 
   labs(title = 'New Cases Daily', subtitle = 'Total New Cases reported daily in US', caption = "Report created June 18, 2021", x = "Date", y = "Cases")
   
@@ -130,14 +133,18 @@ ggplot(data = us_all) +
 
 ## New Deaths Date
 
+This visualization shows a peak and the deadliest day in the US in spring of 2020 and a second peak 
 ```{r New Deaths by date}
 ggplot(data = us_all) +
   geom_line(mapping = aes(x = Date, y = New_Deaths)) +
+  geom_smooth(mapping = aes(x = Date, y = New_Deaths))+
   scale_y_continuous(labels = comma) + 
   labs(title = 'New Deaths Daily', subtitle = 'Total New Deaths reported daily in US', caption = "Report created June 18, 2021", x = "Date", y = "Deaths")
 ```
 
 ## New Cases to New Deaths
+
+This visualization shows the correlation in the number of daily cases vs. daily deaths. Creating separate graphs for each year shows the higher death rate in early 2020. 
 
 ```{r}
 ggplot(us_all, aes(New_Cases, New_Deaths)) +
@@ -149,4 +156,22 @@ ggplot(us_all, aes(New_Cases, New_Deaths)) +
   labs(title = 'New Cases vs New Deaths', subtitle = 'New Cases and New Deaths Daily', caption = "Report created June 18, 2021", x = "Cases", y = "Deaths")+
   facet_wrap(us_all$Year)
 ```
+
+# Conclusion
+
+New covid 19 cases in the US stayed fairly flat until July 2020. Early in 2020 was when the US had the strictest regulations and shut downs. There was a small peak in new cases in the summer of 2020 and the largest peak of new cases occured in the Fall to Winter of 2020 into early 2021.
+
+The death rate was higher in early 2020 before better treatments were discovered. Otherwise the number of cases to number of deaths shows the more cases the more deaths occur. 
+
+## Bias
+
+* The US handled Covid 19 regulations on a state by state basis. Further analysis into specific states along with regulations would be valuable.
+* Vaccinations started in late 2020 in the US. Vaccination rates are not included in this analysis. Further comparsion of vaccination numbers to case and death rates would also be valuable.
+
+
+
+```{r}
+sessionInfo()
+```
+
 
