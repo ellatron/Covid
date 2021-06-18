@@ -28,4 +28,90 @@ Data for this report is from John's Hopkins and can be found on [Github]("https:
 us_cases <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
 us_deaths <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv")
 ```
+# Cleaning Data
+
+## US Cases
+
+### Filtering data
+
+Excluding not needed data. Deleting columns except for UID, Dates, and renaming County and State.
+
+```{r filter us cases}
+us_cases <- us_cases %>%
+  select(-c(iso2, iso3, code3, FIPS, Country_Region, Lat, Long_, Combined_Key)) %>%
+  rename(County = "Admin2") %>%
+  rename(State = "Province_State")
+```
+
+### Converting data into long format
+
+```{r us cases long}
+us_cases <- us_cases %>% 
+  pivot_longer(cols = -c(UID, County, State),
+               names_to = "Date",
+               values_to = "Cases")
+us_cases$Date <- as.Date(us_cases$Date, "%m/%d/%y")
+
+```
+
+## US Deaths
+
+### Filtering Data
+
+Excluding not needed data. Deleting columns except for UID, Dates, population, and renaming County and State.
+
+```{r filter us deaths}
+us_deaths <- us_deaths %>%
+  select(-c(iso2, iso3, code3, FIPS, Country_Region, Lat, Long_, Combined_Key)) %>%
+  rename(County = "Admin2") %>%
+  rename(State = "Province_State")
+```
+
+### Converting data into long format
+
+```{r us deaths long}
+us_deaths <- us_deaths %>% 
+  pivot_longer(cols = -c(UID, County, State, Population),
+               names_to = "Date",
+               values_to = "Deaths")
+us_deaths$Date <- as.Date(us_deaths$Date, "%m/%d/%y")
+```
+
+## Joining Cases and Deaths into a single Data Frame
+
+Joining cases and deaths to a single data frame. Filtering out when cases were 0. This table is broken down by State and County
+
+```{r join cases & deaths}
+us <- us_cases %>%
+  full_join(us_deaths) %>%
+  filter(Cases > 0)
+
+summary(us)
+```
+
+## State totals by Date
+
+Grouping data by State and Date totaling Cases and Deaths for each State. Creating new columns for New Cases and New Deaths each day. Subtracting Case total less the day before total.
+
+```{r State group}
+us_state <- us %>%
+  group_by(State, Date) %>%
+  summarize(Cases = sum(Cases), Deaths = sum(Deaths), Population = sum(Population), .groups = "drop") %>%
+  mutate(New_Cases = Cases - lag(Cases, default=first(Cases))) %>%
+  mutate(New_Deaths = Deaths - lag(Deaths, default = first(Deaths))) %>%
+  filter(New_Deaths >0, New_Cases >0)
+
+```
+
+## Total US by Date
+
+New data frame to adding totals for all states.
+
+```{r Date group}
+us_all <- us_state %>%
+  group_by(Date) %>%
+  summarise(New_Cases = sum(New_Cases), New_Deaths = sum(New_Deaths), Cases = sum(Cases), Deaths = sum(Deaths)) %>%
+  filter(New_Cases > 0) %>%
+
+```
 
