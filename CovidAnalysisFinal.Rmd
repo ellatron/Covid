@@ -112,6 +112,41 @@ us_all <- us_state %>%
   group_by(Date) %>%
   summarise(New_Cases = sum(New_Cases), New_Deaths = sum(New_Deaths), Cases = sum(Cases), Deaths = sum(Deaths)) %>%
   filter(New_Cases > 0) %>%
+  mutate(Year = year(Date))
 
+```
+
+# Analysis
+
+## New Cases by Date
+
+```{r US new cases line}
+ggplot(data = us_all) +
+  geom_line(mapping = aes(x = Date, y = New_Cases)) +
+  scale_y_continuous(labels = comma) + 
+  labs(title = 'New Cases Daily', subtitle = 'Total New Cases reported daily in US', caption = "Report created June 18, 2021", x = "Date", y = "Cases")
+  
+```
+
+## New Deaths Date
+
+```{r New Deaths by date}
+ggplot(data = us_all) +
+  geom_line(mapping = aes(x = Date, y = New_Deaths)) +
+  scale_y_continuous(labels = comma) + 
+  labs(title = 'New Deaths Daily', subtitle = 'Total New Deaths reported daily in US', caption = "Report created June 18, 2021", x = "Date", y = "Deaths")
+```
+
+## New Cases to New Deaths
+
+```{r}
+ggplot(us_all, aes(New_Cases, New_Deaths)) +
+  geom_point(color = us_all$Year) +
+  geom_smooth() +
+  scale_y_continuous(labels = comma) + 
+  scale_x_continuous(labels = comma) +
+  theme(legend.position=c(0.9, 0.9)) +
+  labs(title = 'New Cases vs New Deaths', subtitle = 'New Cases and New Deaths Daily', caption = "Report created June 18, 2021", x = "Cases", y = "Deaths")+
+  facet_wrap(us_all$Year)
 ```
 
